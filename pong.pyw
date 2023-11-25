@@ -1,6 +1,7 @@
 import pygame
 import random
-import tkinter.messagebox
+import tkinter as tk
+from tkinter import simpledialog
 
 pygame.init()
 
@@ -29,6 +30,9 @@ pygame.display.update()
 normal = ["by += bvel", "by -= bvel"][random.randint(0, 1)]
 normalx = "bx -= bvel"
 
+root = tk.Tk()
+root.withdraw()
+name = simpledialog.askstring("Input", "Enter your name:")
 
 run = True
 while run:
@@ -38,36 +42,25 @@ while run:
             run = False
     keys = pygame.key.get_pressed()
 
-    #if keys[pygame.K_LEFT] and x > vel:
-    #    x -= vel
-    #if keys[pygame.K_RIGHT] and x < wix - width - vel:
-    #    x += vel
     if keys[pygame.K_UP] and y > vel:
         y -= vel
     if keys[pygame.K_DOWN] and y < wiy - width - vel:
         y += vel
-
 
     if bx < bvel:
         run = False
     if bx > wix - bwidth - bvel:
         normalx = "bx -= bvel"
         score += 1
+        bvel += 0.05
 
-    
-
-    
     if by < bvel:
         normal = "by += bvel"
     elif by > wiy - bwidth - bvel:
         normal = "by -= bvel"
 
-    
-
     exec(normal)
-    
 
-    
     win.fill((0, 0, 0))
     paddle = pygame.draw.rect(win, (255, 0, 0), (x, y, width, height))
     ball = pygame.draw.rect(win, (255, 255, 255), (bx, by, bwidth, bheight))
@@ -77,7 +70,17 @@ while run:
     if collide:
         normalx = "bx += bvel"
     exec(normalx)
+
 pygame.quit()
 
-tkinter.messagebox.showinfo(title = "Score", message = "Your score is " + str(score) + ".")
-    
+with open('highscores.txt', 'r') as f:
+    lines = f.readlines()
+    uname, uscore = lines
+
+if not lines or int(lines[1]) < score:
+    with open('highscores.txt', 'w') as f:
+        f.write(name + '\n' + str(score))
+        uname, uscore = name, score
+
+tk.messagebox.showinfo(title="Score", message="Your score is " + str(score) + ".")
+tk.messagebox.showinfo(title="Highscore", message="The highscore is " + str(uscore) + " by " + str(uname) + ".")
